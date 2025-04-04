@@ -6,8 +6,8 @@ on:
 
 env:
   AWS_REGION: "us-west-2"           # set this to your preferred AWS region, e.g. us-west-1
-  S3_BUCKET: MY_S3_BUCKET            # set this to your S3 bucket name
-  S3_PATH: MY_S3_PATH                # set this to your desired path in S3 bucket (optional)
+  S3_BUCKET: "pasansa-poc-dataset"            # set this to your S3 bucket name
+  S3_PATH: "simple-workflow/run-01"                # set this to your desired path in S3 bucket (optional)
 
 permissions:
   contents: read
