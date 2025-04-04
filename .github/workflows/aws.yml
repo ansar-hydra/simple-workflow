@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: MY_AWS_REGION           # set this to your preferred AWS region, e.g. us-west-1
+  AWS_REGION: "us-west-2"           # set this to your preferred AWS region, e.g. us-west-1
   S3_BUCKET: MY_S3_BUCKET            # set this to your S3 bucket name
   S3_PATH: MY_S3_PATH                # set this to your desired path in S3 bucket (optional)
 
