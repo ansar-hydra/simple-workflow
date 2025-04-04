@@ -1,0 +1,50 @@
+name: Deploy to Amazon S3
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: MY_AWS_REGION           # set this to your preferred AWS region, e.g. us-west-1
+  S3_BUCKET: MY_S3_BUCKET            # set this to your S3 bucket name
+  S3_PATH: MY_S3_PATH                # set this to your desired path in S3 bucket (optional)
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ env.AWS_REGION }}
+
+    # Optional: Build step if you need to build your project
+    # - name: Build
+    #   run: |
+    #     # Add your build commands here
+    #     npm install
+    #     npm run build
+
+    - name: Upload to S3
+      run: |
+        # If you want to upload the entire repository
+        aws s3 sync . s3://${{ env.S3_BUCKET }}/${{ env.S3_PATH }} --delete
+
+        # Or if you want to upload specific directory (e.g., build output)
+        # aws s3 sync ./build s3://${{ env.S3_BUCKET }}/${{ env.S3_PATH }} --delete
+
+    # Optional: Invalidate CloudFront cache if you're using CloudFront
+    # - name: Invalidate CloudFront
+    #   run: |
+    #     aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
