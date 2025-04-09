@@ -5,16 +5,16 @@ on:
     branches: [ "main" ]
 
 env:
-  AWS_REGION: "us-west-2"           # set this to your preferred AWS region, e.g. us-west-1
-  S3_BUCKET: "pasansa-poc-dataset"            # set this to your S3 bucket name
-  S3_PATH: "simple-workflow/run-01"                # set this to your desired path in S3 bucket (optional)
+  AWS_REGION: "us-west-2"           
+  S3_BUCKET: "pasansa-poc-dataset"            
+  S3_PATH: "simple-workflow/run-01"                
 
 permissions:
   contents: read
 
 jobs:
-  deploy:
-    name: Deploy
+  AutoSync:
+    name: AutoSync
     runs-on: ubuntu-latest
     environment: production
 
@@ -29,22 +29,38 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ env.AWS_REGION }}
 
-    # Optional: Build step if you need to build your project
-    # - name: Build
-    #   run: |
-    #     # Add your build commands here
-    #     npm install
-    #     npm run build
-
     - name: Upload to S3
       run: |
-        # If you want to upload the entire repository
         aws s3 sync . s3://${{ env.S3_BUCKET }}/${{ env.S3_PATH }} --delete
 
-        # Or if you want to upload specific directory (e.g., build output)
-        # aws s3 sync ./build s3://${{ env.S3_BUCKET }}/${{ env.S3_PATH }} --delete
+  dev:
+    needs: AutoSync
+    name: Development
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Dev
+        run: echo "Deploying to Development environment"
 
-    # Optional: Invalidate CloudFront cache if you're using CloudFront
-    # - name: Invalidate CloudFront
-    #   run: |
-    #     aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
+  staging:
+    needs: dev
+    name: Staging
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Staging
+        run: echo "Deploying to Staging environment"
+
+  integ-test:
+    needs: staging
+    name: Integration Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Integration Tests
+        run: echo "Performing Integration Tests"
+
+  prod:
+    needs: integ-test
+    name: Production
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production
+        run: echo "Deploying to Production environment"
