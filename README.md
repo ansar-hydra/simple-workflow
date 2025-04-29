@@ -1,1 +1,1 @@
-Sample line 6
+Sample line 7
